@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,7 +18,9 @@ import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.sefford.circularprogressdrawable.CircularProgressDrawable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         gridViewAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, imageItems);
-        gridView.setAdapter(gridViewAdapter);
+        gridView.setAdapter(    gridViewAdapter);
 
         stopAnimation();
 
