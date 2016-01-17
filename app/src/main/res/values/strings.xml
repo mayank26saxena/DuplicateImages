@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Duplicate Images</string>
+    <string name="finding_images_msg">Finding duplicate images!!</string>
 </resources>
