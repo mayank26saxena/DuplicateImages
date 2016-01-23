@@ -1,6 +1,7 @@
 package com.example.mayank.duplicateimages;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -64,6 +65,12 @@ public class MainActivity extends AppCompatActivity {
 
     int len;
 
+    Boolean b1 = false;
+    Boolean b2 = false;
+    Boolean b3 = false;
+    Boolean b4 = false;
+    Boolean b5 = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridView);
         imageItems = new ArrayList<>();
         getAllImages();
-        gridViewAdapter = new GridViewAdapter(this, R.layout.grid_item_layout, imageItems);
-        gridView.setAdapter(gridViewAdapter);
 
     }
 
@@ -110,10 +115,12 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "strUrls array size : " + strUrls.length);
                         Log.d(TAG, "mNames array size : " + mNames.length);
 
-                        len = mUrls.length - 1;
+                        len = mUrls.length;
                         Log.d(TAG, "Value of len : " + len);
 
-                    } catch (Exception e){ Log.d(TAG, "Exception : " + e); }
+                    } catch (Exception e) {
+                        Log.d(TAG, "Exception : " + e);
+                    }
                 }
             }.start();
         }
@@ -145,47 +152,52 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Log.d(TAG, "In doInBackground() method for part1");
-            for (int i = 0; i < len/5 ; i++) {
+            for (int k = 0; k < len / 5; k++) {
                 try {
-                    i1 = getContentResolver().openInputStream(mUrls[i]);
+                    i1 = getContentResolver().openInputStream(mUrls[k]);
                     image1 = IOUtils.toByteArray(i1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                for (int j = i + 1; j < len & j!=i ; j++) {
-                    Log.d(TAG, "Comparing image number " + i + " with image number " + j + ".");
+                for (int l = k + 1; l < len & l != k; l++) {
+                    Log.d(TAG, "Comparing image number " + k + " with image number " + l + ".");
                     try {
-                        i2 = getContentResolver().openInputStream(mUrls[j]);
+                        i2 = getContentResolver().openInputStream(mUrls[l]);
                         image2 = IOUtils.toByteArray(i2);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (Arrays.equals(image1, image2)) {
-                        Log.d(TAG, "Images are similar --> " + uris[i].toString() + " &&& " + uris[j].toString());
-                        try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[i]);
-                            bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[j]);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        imageItems.add(new ImageItem(bitmap1, "Image#" + i));
-                        imageItems.add(new ImageItem(bitmap2, "Image#" + j));
-                    } else
-                        Log.d(TAG, "Images are not similar.");
+                    if (k != l) {
+                        if (Arrays.equals(image1, image2)) {
+                            b1 = true;
+                            Log.d(TAG, "Images are similar --> " + mUrls[k].toString() + " &&& " + mUrls[l].toString());
+                            try {
+                                bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
+                                bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            imageItems.add(new ImageItem(bitmap1, "Image#" + k));
+                            imageItems.add(new ImageItem(bitmap2, "Image#" + l));
+                        } else
+                            Log.d(TAG, "Images are not similar.");
+                    }
                 }
             }
             return null;
         }
 
         @Override
-        protected void onPreExecute()
-        {
-            Log.i("PreExecute()" ,"compareImagesPart1()");
+        protected void onPreExecute() {
+            Log.i("PreExecute()", "compareImagesPart1()");
         }
 
-        protected void onPostExecute(Void result)
-        {
-            Log.d("PostExecute()" ,"compareImagesPart1()");
+        protected void onPostExecute(Void result) {
+            Log.d("PostExecute()", "compareImagesPart1()");
+            if (b1) {
+                gridViewAdapter = new GridViewAdapter(MainActivity.this, R.layout.grid_item_layout, imageItems);
+                gridView.setAdapter(gridViewAdapter);
+            }
             myProgressDialog.dismiss();
         }
     }
@@ -195,14 +207,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Log.d(TAG, "In doInBackground() method for part2");
-            for (int k = (2*len)/5 ; k < (3*len)/5 ; k++) {
+            for (int k = (2 * len) / 5; k < (3 * len) / 5; k++) {
                 try {
                     i3 = getContentResolver().openInputStream(mUrls[k]);
                     image3 = IOUtils.toByteArray(i3);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                for (int l = 0 ; l < len && l!=k ; l++) {
+                for (int l = 0; l < len && l != k; l++) {
                     Log.d(TAG, "Comparing image number " + k + " with image number " + l + ".");
                     try {
                         i4 = getContentResolver().openInputStream(mUrls[l]);
@@ -210,18 +222,21 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (Arrays.equals(image3, image4)) {
-                        Log.d(TAG, "Images are similar --> " + uris[k].toString() + " &&& " + uris[l].toString());
-                        try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
-                            bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        imageItems.add(new ImageItem(bitmap1, "Image#" + k));
-                        imageItems.add(new ImageItem(bitmap2, "Image#" + l));
-                    } else
-                        Log.d(TAG, "Images are not similar.");
+                    if (k != l) {
+                        if (Arrays.equals(image3, image4)) {
+                            b2 = true;
+                            Log.d(TAG, "Images are similar --> " + mUrls[k].toString() + " &&& " + mUrls[l].toString());
+                            try {
+                                bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
+                                bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            imageItems.add(new ImageItem(bitmap1, "Image#" + k));
+                            imageItems.add(new ImageItem(bitmap2, "Image#" + l));
+                        } else
+                            Log.d(TAG, "Images are not similar.");
+                    }
                 }
             }
 
@@ -229,13 +244,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute()
-        {
-            Log.i("PreExecute()" ,"compareImagesPart2()");
+        protected void onPreExecute() {
+            Log.i("PreExecute()", "compareImagesPart2()");
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
+            if (b2) {
+                gridViewAdapter = new GridViewAdapter(MainActivity.this, R.layout.grid_item_layout, imageItems);
+                gridView.setAdapter(gridViewAdapter);
+            }
             myProgressDialog.dismiss();
             Log.d("PostExecute()", "compareImagesPart2()");
         }
@@ -247,14 +264,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Log.d(TAG, "In doInBackground() method for part2");
-            for (int k = (3*len)/5 ; k <(4*len)/5 ; k++) {
+            for (int k = (3 * len) / 5; k < (4 * len) / 5; k++) {
                 try {
                     i5 = getContentResolver().openInputStream(mUrls[k]);
                     image5 = IOUtils.toByteArray(i5);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                for (int l = 0 ; l < len && l!=k ; l++) {
+                for (int l = 0; l < len && l != k; l++) {
                     Log.d(TAG, "Comparing image number " + k + " with image number " + l + ".");
                     try {
                         i6 = getContentResolver().openInputStream(mUrls[l]);
@@ -262,18 +279,21 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (Arrays.equals(image5, image6)) {
-                        Log.d(TAG, "Images are similar --> " + uris[k].toString() + " &&& " + uris[l].toString());
-                        try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
-                            bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        imageItems.add(new ImageItem(bitmap1, "Image#" + k));
-                        imageItems.add(new ImageItem(bitmap2, "Image#" + l));
-                    } else
-                        Log.d(TAG, "Images are not similar.");
+                    if (k != l) {
+                        if (Arrays.equals(image5, image6)) {
+                            b3 = true;
+                            Log.d(TAG, "Images are similar --> " + mUrls[k].toString() + " &&& " + mUrls[l].toString());
+                            try {
+                                bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
+                                bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            imageItems.add(new ImageItem(bitmap1, "Image#" + k));
+                            imageItems.add(new ImageItem(bitmap2, "Image#" + l));
+                        } else
+                            Log.d(TAG, "Images are not similar.");
+                    }
                 }
             }
 
@@ -281,13 +301,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute()
-        {
-            Log.i("PreExecute()" ,"compareImagesPart3()");
+        protected void onPreExecute() {
+            Log.i("PreExecute()", "compareImagesPart3()");
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
+            if (b3) {
+                gridViewAdapter = new GridViewAdapter(MainActivity.this, R.layout.grid_item_layout, imageItems);
+                gridView.setAdapter(gridViewAdapter);
+            }
             myProgressDialog.dismiss();
             Log.d("PostExecute()", "compareImagesPart3()");
         }
@@ -299,14 +321,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Log.d(TAG, "In doInBackground() method for part2");
-            for (int k = (3*len)/5 ; k <(4*len)/5 ; k++) {
+            for (int k = (3 * len) / 5; k < (4 * len) / 5; k++) {
                 try {
                     i7 = getContentResolver().openInputStream(mUrls[k]);
                     image7 = IOUtils.toByteArray(i7);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                for (int l = 0 ; l < len && l!=k ; l++) {
+                for (int l = 0; l < len && l != k; l++) {
                     Log.d(TAG, "Comparing image number " + k + " with image number " + l + ".");
                     try {
                         i8 = getContentResolver().openInputStream(mUrls[l]);
@@ -314,18 +336,21 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (Arrays.equals(image7, image8)) {
-                        Log.d(TAG, "Images are similar --> " + uris[k].toString() + " &&& " + uris[l].toString());
-                        try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
-                            bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        imageItems.add(new ImageItem(bitmap1, "Image#" + k));
-                        imageItems.add(new ImageItem(bitmap2, "Image#" + l));
-                    } else
-                        Log.d(TAG, "Images are not similar.");
+                    if (k != l) {
+                        if (Arrays.equals(image7, image8)) {
+                            b4 = true;
+                            Log.d(TAG, "Images are similar --> " + mUrls[k].toString() + " &&& " + mUrls[l].toString());
+                            try {
+                                bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
+                                bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            imageItems.add(new ImageItem(bitmap1, "Image#" + k));
+                            imageItems.add(new ImageItem(bitmap2, "Image#" + l));
+                        } else
+                            Log.d(TAG, "Images are not similar.");
+                    }
                 }
             }
 
@@ -333,13 +358,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute()
-        {
-            Log.i("PreExecute()" ,"compareImagesPart4()");
+        protected void onPreExecute() {
+            Log.i("PreExecute()", "compareImagesPart4()");
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
+            if (b4) {
+                gridViewAdapter = new GridViewAdapter(MainActivity.this, R.layout.grid_item_layout, imageItems);
+                gridView.setAdapter(gridViewAdapter);
+            }
             myProgressDialog.dismiss();
             Log.d("PostExecute()", "compareImagesPart4()");
         }
@@ -351,14 +378,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Log.d(TAG, "In doInBackground() method for part2");
-            for (int k = (4*len)/5 ; k <len-1 ; k++) {
+            for (int k = (4 * len) / 5; k < len; k++) {
                 try {
                     i9 = getContentResolver().openInputStream(mUrls[k]);
                     image9 = IOUtils.toByteArray(i9);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                for (int l = 0 ; l < len && l!=k ; l++) {
+                for (int l = 0; l < len; l++) {
                     Log.d(TAG, "Comparing image number " + k + " with image number " + l + ".");
                     try {
                         i10 = getContentResolver().openInputStream(mUrls[l]);
@@ -366,18 +393,21 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (Arrays.equals(image9, image10)) {
-                        Log.d(TAG, "Images are similar --> " + uris[k].toString() + " &&& " + uris[l].toString());
-                        try {
-                            bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
-                            bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        imageItems.add(new ImageItem(bitmap1, "Image#" + k));
-                        imageItems.add(new ImageItem(bitmap2, "Image#" + l));
-                    } else
-                        Log.d(TAG, "Images are not similar.");
+                    if (k != l) {
+                        if (Arrays.equals(image9, image10)) {
+                            b5 = true;
+                            Log.d(TAG, "Images are similar --> " + mUrls[k].toString() + " &&& " + mUrls[l].toString());
+                            try {
+                                bitmap1 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[k]);
+                                bitmap2 = MediaStore.Images.Media.getBitmap(getContentResolver(), mUrls[l]);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            imageItems.add(new ImageItem(bitmap1, "Image#" + k));
+                            imageItems.add(new ImageItem(bitmap2, "Image#" + l));
+                        } else
+                            Log.d(TAG, "Images are not similar.");
+                    }
                 }
             }
 
@@ -385,13 +415,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute()
-        {
-            Log.i("PreExecute()" ,"compareImagesPart5()");
+        protected void onPreExecute() {
+            Log.i("PreExecute()", "compareImagesPart5()");
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
+            if (b5) {
+                gridViewAdapter = new GridViewAdapter(MainActivity.this, R.layout.grid_item_layout, imageItems);
+                gridView.setAdapter(gridViewAdapter);
+            }
             myProgressDialog.dismiss();
             Log.d("PostExecute()", "compareImagesPart5()");
         }
