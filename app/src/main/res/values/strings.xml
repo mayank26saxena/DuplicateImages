@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Duplicate Images</string>
     <string name="finding_images_msg">Finding duplicate images!!</string>
+    <string name="pls_wait_txt">Images are being loaded. Please wait...</string>
 </resources>
